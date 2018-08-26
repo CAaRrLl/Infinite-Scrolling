@@ -1,6 +1,7 @@
 # Infinite-Scrolling
 无限滚动加载组件
 
+- 封装原生ajax
 - 设置预加载阀值
 - DOM节点缓存
 - 图片懒加载优化

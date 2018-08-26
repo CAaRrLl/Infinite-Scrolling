@@ -1,0 +1,19 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "node 爬虫",
+  "main": "master.js",
+  "scripts": {
+    "start": "node master.js"
+  },
+  "keywords": [
+    "nodejs"
+  ],
+  "author": "CAaRrLl",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "mysql": "^2.16.0",
+    "superagent": "^3.8.3"
+  }
+}

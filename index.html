@@ -3,18 +3,17 @@
     <head>
         <title>无限滚动展示</title>
         <meta name='viewport' content='initial-scale=1,width=device-width' />
-        <script type='text/javascript' src='./scrollcp.js'></script>
+        <script type='text/javascript' src='scrollcp.js'></script>
     </head>
     <body>
         <div id="forscrolling"></div>
         <script>
             $scrollcp('#forscrolling', {
-                url: 'http://127.0.0.1:8080/api/essay/list',
+                url: '/api/essay/list',
                 data: {
                     page: 1,
                     size: 8,
-                },
-                map: () => {}
+                }
             });
         </script>
     </body>

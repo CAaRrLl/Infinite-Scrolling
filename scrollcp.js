@@ -2,18 +2,16 @@
 $scrollcp(selector: string, options: {
     url: string,
     data: object,
-    map: function,
-    
 })
 */
 (function(win) {
     function Scroll(id, options) {
         this.containerSelector = id;
-        this.ulId = 'ul-box';
-        this.threshold = 50;
+        this.ulId = 'ul-box';   
+        this.threshold = 50;        //滚动阀值
         this.url = options.url;
         this.data = options.data;
-        this.map = options.map;
+        this.cache = [];            //缓存dom节点,用于懒加载
         this.isFetching = false;
     }
 
@@ -27,7 +25,10 @@ $scrollcp(selector: string, options: {
 
         this.initStyle();
 
-        this.fetchData(this.handleScroll);
+        this.fetchData(() => {
+            this.handleScroll();
+            this.startLazyLoad();
+        });
     }
 
     Scroll.prototype.fetchData = function(callback) {
@@ -35,7 +36,9 @@ $scrollcp(selector: string, options: {
         .then(resData => {
             var body = JSON.parse(resData);
             var ul = document.getElementById(this.ulId);
-            ul.appendChild(this.createList(body));
+            var list = this.createList(body);
+            this.updateCache(list);
+            ul.appendChild(list);
             this.isFetching = false;
             if(callback) {
                 callback.call(this, body);
@@ -51,6 +54,7 @@ $scrollcp(selector: string, options: {
         data.forEach(function(list) {
             var li = document.createElement('li');
             li.className = 'my-list';
+            li.id = `li-${list.id}`;
             li.innerHTML = `
                 <img class='my-img' data-src=${list.img}/>
                 <div class='content'>
@@ -67,12 +71,40 @@ $scrollcp(selector: string, options: {
         var context = this;
         window.onscroll = throttle(function() {
             if(isReachBottom(context.threshold) && !context.isFetching) {
-                console.log('dd')
                 context.isFetching = true;
                 context.data.page++;
                 context.fetchData();
             }
+            context.startLazyLoad();
         }, 100);
+    }
+
+    Scroll.prototype.startLazyLoad = function() {
+        this.cache.forEach(function(item) {
+            if(isVisible(item.id)) {
+                var imgNode = item.img;
+                const src = `https:${imgNode.dataset.src}`;
+
+                var img = new Image();
+                img.onload = function() {
+                    imgNode.src = src;
+                    imgNode.style.opacity = 1;
+                }
+                img.src = src;
+            }
+        });
+    }
+
+    Scroll.prototype.updateCache = function(node) {
+        var list = node.querySelectorAll('.my-list');
+        var cache = this.cache = [];
+        list.forEach(function(item) {
+            cache.push({
+                id: item.id,
+                img: item.querySelector('.my-img'),
+                node: item
+            })
+        });
     }
 
     Scroll.prototype.initStyle = function() {
@@ -94,7 +126,7 @@ $scrollcp(selector: string, options: {
                 padding-left: 5px;
                 padding-right: 5px;
                 box-shadow: 0px 1px 4px 0px #d2d2d2;
-            }
+            } 
             .my-img {
                 width: 90px;
                 height: 72px;
@@ -102,6 +134,8 @@ $scrollcp(selector: string, options: {
                 position: relative;
                 top:24px;
                 margin-right: 10px;
+                opacity: 0;
+                transition: opacity 1s;
             }
             .content {
                 position: relative;

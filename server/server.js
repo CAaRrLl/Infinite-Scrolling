@@ -1,8 +1,11 @@
 const http = require('http');
 const initDB = require('./db').initTable;
+const fs = require('fs');
 const getEssay = require('./db').getEssay;
 
-const port = 8080;
+const port = process.env.PORT || 8080;
+
+const staticUrl = '/infinite/scroll';
 
 function parseUrl(query) {
     let info = query.split('?');
@@ -16,6 +19,25 @@ function parseUrl(query) {
         });
     }
     return {url, params};
+}
+
+function dealStatic(url, res) {
+    let fileUrl = url.split(staticUrl)[1];
+    if(fileUrl === '/show') {
+        fileUrl = '../index.html';
+    } else {
+        fileUrl = `..${fileUrl}`;
+    }
+    fs.readFile(fileUrl, (err, data) => {
+        if(err) {
+            res.writeHead(500);
+            res.end();
+            throw Error(err);
+        }
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.end(data);
+    })
+    return;
 }
 
 initDB();
@@ -49,6 +71,11 @@ http.createServer((req, res) => {
             res.end();
             throw Error(error);
         })
+        return;
+    }
+
+    if(url.indexOf(staticUrl) == 0) {
+        dealStatic(url, res);
         return;
     }
 

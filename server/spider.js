@@ -60,7 +60,6 @@ function getNextNoteIds($, list) {
         text = li.find('.content .abstract').text();
 
         collect(collectData, note_id, title, img_src, text);
-        // console.log(collectData[note_id]);
     });
     return seen_snote_ids;
 }

@@ -5,7 +5,10 @@ const getEssay = require('./db').getEssay;
 
 const port = process.env.PORT || 8080;
 
-const staticUrl = '/infinite/scroll';
+const app = [
+    {url: '/infinite/scroll', path: '..'},
+    {url: '/draggable', path:'../../Draggable'}
+];
 
 function parseUrl(query) {
     let info = query.split('?');
@@ -21,18 +24,19 @@ function parseUrl(query) {
     return {url, params};
 }
 
-function dealStatic(url, res) {
-    let fileUrl = url.split(staticUrl)[1];
+function dealApp(url, app, path, res) {
+    let fileUrl = url.replace(app, '');
     if(fileUrl === '/show') {
-        fileUrl = '../index.html';
+        fileUrl = `${path}/index.html`;
     } else {
-        fileUrl = `..${fileUrl}`;
+        fileUrl = `${path}${fileUrl}`;
     }
     fs.readFile(fileUrl, (err, data) => {
         if(err) {
             res.writeHead(500);
             res.end();
-            throw Error(err);
+            console.log(err);
+            process.exit();
         }
         res.writeHead(200, {'Content-Type': 'text/html'});
         res.end(data);
@@ -69,14 +73,17 @@ http.createServer((req, res) => {
         .catch(error => {
             res.writeHead(500);
             res.end();
-            throw Error(error);
+            console.log(error);
+            process.exit();
         })
         return;
     }
-
-    if(url.indexOf(staticUrl) == 0) {
-        dealStatic(url, res);
-        return;
+    
+    for(const info of app) {
+        if(url.indexOf(info.url) === 0) {
+            dealApp(url, info.url, info.path, res);
+            return;
+        }
     }
 
     res.writeHead(404);

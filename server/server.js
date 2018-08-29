@@ -6,8 +6,8 @@ const getEssay = require('./db').getEssay;
 const port = process.env.PORT || 8080;
 
 const app = [
-    {url: '/infinite/scroll', path: '..'},
-    {url: '/draggable', path:'../../Draggable'}
+    {url: '/demo/infinite/scroll', path: '..'},
+    {url: '/demo/draggable', path:'../../Draggable'}
 ];
 
 function parseUrl(query) {
@@ -50,14 +50,14 @@ http.createServer((req, res) => {
     const {url, params} = parseUrl(req.url);
 
     /*
-    api: /api/essay/list
+    api: /demo/api/essay/list
     params: {
         page: number //当前页码
         size: number //每页条目
     }
     */
 
-    if(url === '/api/essay/list') {
+    if(url === '/demo/api/essay/list') {
         if(!params.page || !params.size) {
             res.writeHead(400);
             res.end();

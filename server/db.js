@@ -1,26 +1,11 @@
 const mysql = require('mysql');
 
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
     host: '127.0.0.1',
-    user: 'jijinping',
-    password: 'jijinping',
+    user: 'root',
+    password: '',
     database: 'my_spider_data'
 });
-
-connect();
-
-function connect() {
-    connection.connect();
-
-    connection.on('error', function(err) {
-        if(err.code === 'PROTOCOL_CONNECTION_LOST') {
-            console.error('db error执行重连:'+err.message);
-            connect();
-        } else {
-            throw Error(error);;
-        }
-    });
-}
 
 exports.db = connection;
 exports.initTable = function() {

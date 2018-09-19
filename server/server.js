@@ -92,3 +92,8 @@ http.createServer((req, res) => {
 }).listen(port);
 
 console.info('server start success, listening:', port);
+
+process.on('uncaughtException', (err)=> {
+    fs.writeFile('serverErr.txt', JSON.stringify(err));
+    process.exit();
+});

@@ -1,10 +1,15 @@
 const mysql = require('mysql');
+const fs = require('fs');
 
 const connection = mysql.createPool({
     host: '127.0.0.1',
     user: 'root',
     password: '',
     database: 'my_spider_data'
+});
+
+connection.on('error', (err) => {
+    fs.writeFile('dbErr.txt', JSON.stringify(err));
 });
 
 exports.db = connection;
